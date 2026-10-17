@@ -57,6 +57,21 @@ src/
 public/images/         оптимизированные изображения (webp)
 ```
 
+## Проверки и тесты
+
+```bash
+npm run lint        # ESLint
+npm run typecheck   # TypeScript
+npm run build       # продакшен-сборка (нужна перед e2e)
+npm run test:e2e    # Playwright: десктоп + мобильный профиль
+```
+
+Первый запуск тестов: `npx playwright install chromium`. На Ubuntu новее 24.04 Playwright может не узнать систему — тогда добавьте `PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64` перед командой.
+
+На каждый push в `main` и pull request GitHub Actions (`.github/workflows/ci.yml`) запускает все проверки.
+
+Dev-сервер с телефона в той же сети: в `.env.local` укажите `ALLOWED_DEV_ORIGINS=<IP компьютера>`.
+
 ## SEO
 
 - `sitemap.xml`, `robots.txt` и манифест генерируются автоматически (`src/app/sitemap.ts`, `robots.ts`, `manifest.ts`); новые модели попадают в sitemap сами.
