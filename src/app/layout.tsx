@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { Footer } from "@/components/footer";
+import { siteDescription, siteName, siteTitle, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,13 +12,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "ДвериГрад — межкомнатные двери для современного интерьера",
-    template: "%s — ДвериГрад",
+    default: siteTitle,
+    template: `%s — ${siteName}`,
   },
-  description:
-    "Более 1000 моделей межкомнатных дверей в наличии. Гарантия до 5 лет, бесплатный замер и доставка по всей России.",
+  description: siteDescription,
+  applicationName: siteName,
+  formatDetection: { telephone: false },
+  openGraph: { type: "website", locale: "ru_RU", siteName },
+  // Search console ownership codes (Яндекс.Вебмастер / Google Search Console)
+  verification: {
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+  },
 };
 
 export const viewport: Viewport = {

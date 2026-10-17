@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Image from "next/image";
 import { Check, Hammer, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { Faq, FeatureGrid, InfoPage, PageHeader, SectionTitle, Steps } from "@/components/info/blocks";
 import { CallbackForm } from "@/components/info/callback-form";
 
-export const metadata: Metadata = {
-  title: "Установка дверей",
-  description: "Бесплатный замер и профессиональная установка межкомнатных дверей под ключ.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Установка межкомнатных дверей под ключ",
+  description:
+    "Бесплатный замер и профессиональная установка межкомнатных дверей: коробка, наличники, доборы, врезка фурнитуры. Гарантия на монтаж.",
+  path: "/installation",
+});
 
 const steps = [
   { title: "Бесплатный замер", text: "Мастер приезжает в удобное время, замеряет проёмы и помогает с выбором." },
@@ -41,7 +44,7 @@ const faq = [
 export default function InstallationPage() {
   return (
     <InfoPage>
-      <PageHeader
+      <PageHeader path="/installation"
         title="Установка дверей"
         lead="Замерим проёмы бесплатно, подберём комплектацию и установим двери под ключ — аккуратно и в срок."
       />

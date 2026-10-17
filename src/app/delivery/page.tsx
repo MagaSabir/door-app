@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { Banknote, Building2, CreditCard, FileText, MapPin, Package, Store, Truck } from "lucide-react";
 import { Faq, FeatureGrid, InfoPage, PageHeader, SectionTitle } from "@/components/info/blocks";
 import { CallbackForm } from "@/components/info/callback-form";
 import { company } from "@/lib/data";
 
-export const metadata: Metadata = {
-  title: "Доставка и оплата",
-  description: "Доставка межкомнатных дверей по городу и по всей России, самовывоз, способы оплаты.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Доставка и оплата межкомнатных дверей",
+  description:
+    "Доставка межкомнатных дверей по городу и по всей России, подъём на этаж, самовывоз. Оплата наличными, картой, по СБП или по счёту.",
+  path: "/delivery",
+});
 
 // TODO: уточнить реальные условия и сроки доставки
 const delivery = [
@@ -33,7 +36,7 @@ const faq = [
 export default function DeliveryPage() {
   return (
     <InfoPage>
-      <PageHeader
+      <PageHeader path="/delivery"
         title="Доставка и оплата"
         lead="Привозим двери по городу и отправляем по всей России. Оплата — после замера и подтверждения заказа."
       />

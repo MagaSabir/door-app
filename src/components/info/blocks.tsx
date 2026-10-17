@@ -1,9 +1,14 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 
-export function PageHeader({ title, lead }: { title: string; lead?: string }) {
+export function PageHeader({ title, lead, path }: { title: string; lead?: string; path: string }) {
   return (
     <header>
-      <Breadcrumbs items={[{ href: "/", label: "Главная" }, { label: title }]} />
+      <Breadcrumbs
+        items={[
+          { href: "/", label: "Главная" },
+          { href: path, label: title },
+        ]}
+      />
       <h1 className="mt-4 text-[28px] font-semibold tracking-tight lg:mt-6 lg:text-[44px]">{title}</h1>
       {lead && <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-ink/75 lg:text-lg">{lead}</p>}
     </header>

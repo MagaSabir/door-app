@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { InfoPage, PageHeader } from "@/components/info/blocks";
 import { CallbackForm } from "@/components/info/callback-form";
 import { company, managerUrl, phone } from "@/lib/data";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Контакты",
-  description: `Телефон ${phone.display}. ${company.address}. ${company.hours}.`,
-};
+  description: `Телефон ${phone.display}. ${company.address}. ${company.hours}. Шоурум межкомнатных дверей ДвериГрад.`,
+  path: "/contacts",
+});
 
 const contacts = [
   { icon: Phone, label: "Телефон", value: phone.display, href: phone.href },
@@ -20,7 +22,7 @@ const contacts = [
 export default function ContactsPage() {
   return (
     <InfoPage>
-      <PageHeader title="Контакты" lead="Звоните, пишите или приезжайте в шоурум — покажем двери вживую и поможем с выбором." />
+      <PageHeader path="/contacts" title="Контакты" lead="Звоните, пишите или приезжайте в шоурум — покажем двери вживую и поможем с выбором." />
 
       <div className="mt-8 grid gap-8 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-14">
         <section aria-label="Контактная информация">

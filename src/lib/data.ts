@@ -157,6 +157,13 @@ export const products: Product[] = [
   },
 ];
 
+/** All photos of a product, largest (gallery) first, without duplicates */
+export function productImages(product: Product) {
+  return [...new Set([...product.gallery, product.image, ...Object.values(product.colorImages ?? {})])].filter(
+    (src): src is string => Boolean(src),
+  );
+}
+
 export function getProduct(slug: string) {
   return products.find((p) => p.slug === slug);
 }
@@ -178,11 +185,14 @@ export const company = {
   address: "г. Москва, ул. Примерная, д. 1",
   showroom: "Шоурум: ТЦ «Пример», 2 этаж",
   hours: "Ежедневно с 9:00 до 21:00",
+  /** Same hours in schema.org format — keep in sync with `hours` */
+  openingHours: "Mo-Su 09:00-21:00",
   legal: "ООО «ДвериГрад», ИНН 0000000000",
 };
 
 // TODO: заменить на реальный контакт менеджера (Telegram/WhatsApp)
 export const managerUrl = "https://t.me/your_manager";
+
 
 const priceFormatter = new Intl.NumberFormat("ru-RU");
 

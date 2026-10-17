@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { Catalog } from "@/components/catalog/catalog";
+import { products } from "@/lib/data";
+import { JsonLd, itemListLd } from "@/lib/json-ld";
 
-export const metadata: Metadata = {
-  title: "Каталог межкомнатных дверей",
-  description: "Современные, классические, лофт и сканди двери. Фильтры по цене, цвету и покрытию.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Каталог межкомнатных дверей — цены и фото",
+  description:
+    "Межкомнатные двери в стилях модерн, классика, лофт и сканди: фото, цвета, размеры и цены. Бесплатный замер, доставка и установка.",
+  path: "/catalog",
+});
 
 export default function CatalogPage() {
   return (
     <main>
+      <JsonLd data={itemListLd(products)} />
       <Catalog />
     </main>
   );

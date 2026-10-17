@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Hammer, ShieldCheck, Sparkles } from "lucide-react";
-import { formatPrice, getProduct, products } from "@/lib/data";
+import { formatPrice, getProduct, pluralize, products } from "@/lib/data";
+import { JsonLd, productLd } from "@/lib/json-ld";
+import { pageMetadata } from "@/lib/site";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ProductView } from "@/components/product/product-view";
 import { ProductTabs } from "@/components/product/product-tabs";
@@ -14,11 +16,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/catalog/[slug]">): Promise<Metadata> {
   const product = getProduct((await params).slug);
   if (!product) return {};
-  return {
-    title: `Дверь ${product.name} — ${formatPrice(product.price)}`,
-    description: product.summary,
-    openGraph: { images: [product.gallery[0]] },
-  };
+  const colorsCount = `${product.colors.length} ${pluralize(product.colors.length, ["цвет", "цвета", "цветов"])}`;
+  const sizes = `${Math.min(...product.sizes)}–${Math.max(...product.sizes)} мм`;
+  return pageMetadata({
+    title: `Межкомнатная дверь ${product.name} — купить ${formatPrice(product.price)}`,
+    description: `${product.summary} ${colorsCount}, ширина ${sizes}. Бесплатный замер, доставка и установка.`,
+    path: `/catalog/${product.slug}`,
+  });
 }
 
 const perks = [
@@ -35,12 +39,12 @@ export default async function ProductPage({ params }: PageProps<"/catalog/[slug]
 
   return (
     <main className="mx-auto max-w-[1280px] px-4 pb-10 pt-4 lg:px-10 lg:pb-20 lg:pt-6">
+      <JsonLd data={productLd(product)} />
       <Breadcrumbs
         items={[
           { href: "/", label: "Главная" },
           { href: "/catalog", label: "Каталог" },
-          { href: "/catalog", label: "Межкомнатные двери" },
-          { label: product.name },
+          { href: `/catalog/${product.slug}`, label: product.name },
         ]}
       />
 

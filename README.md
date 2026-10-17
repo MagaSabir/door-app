@@ -30,7 +30,9 @@ npm start
 
 | Переменная | Назначение |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Публичный адрес сайта (для OG-картинок) |
+| `NEXT_PUBLIC_SITE_URL` | Публичный адрес сайта: canonical, sitemap, превью ссылок. На Vercel по умолчанию — продакшен-домен проекта |
+| `NEXT_PUBLIC_YANDEX_VERIFICATION` | Код подтверждения Яндекс.Вебмастера |
+| `NEXT_PUBLIC_GOOGLE_VERIFICATION` | Код подтверждения Google Search Console |
 | `TELEGRAM_BOT_TOKEN` | Токен бота от @BotFather |
 | `TELEGRAM_CHAT_ID` | ID чата менеджеров, куда приходят заявки |
 
@@ -53,6 +55,13 @@ src/
     server/            серверные утилиты (отправка в Telegram)
 public/images/         оптимизированные изображения (webp)
 ```
+
+## SEO
+
+- `sitemap.xml`, `robots.txt` и манифест генерируются автоматически (`src/app/sitemap.ts`, `robots.ts`, `manifest.ts`); новые модели попадают в sitemap сами.
+- Превью для мессенджеров и соцсетей (1200×630) собираются из фото: `src/app/opengraph-image.ts` и `src/app/catalog/[slug]/opengraph-image.ts`.
+- Микроразметка schema.org (организация, товары, хлебные крошки) — `src/lib/json-ld.tsx`.
+- На preview-деплоях Vercel `robots.txt` закрывает сайт от индексации.
 
 ## Как добавить модель
 

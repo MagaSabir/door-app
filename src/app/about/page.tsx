@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Handshake, Ruler, Truck } from "lucide-react";
 import { FeatureGrid, InfoPage, PageHeader, SectionTitle, Steps } from "@/components/info/blocks";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "О компании",
-  description: "ДвериГрад — межкомнатные двери для современного интерьера: более 1000 моделей, гарантия до 5 лет.",
-};
+  description:
+    "ДвериГрад — межкомнатные двери для современного интерьера: более 1000 моделей в наличии, гарантия до 5 лет, замер, доставка и монтаж под ключ.",
+  path: "/about",
+});
 
 const stats = [
   { value: "1000+", label: "моделей в наличии" },
@@ -33,7 +36,7 @@ const steps = [
 export default function AboutPage() {
   return (
     <InfoPage>
-      <PageHeader
+      <PageHeader path="/about"
         title="О компании"
         lead="ДвериГрад — межкомнатные двери для современного интерьера. Помогаем выбрать, привозим и устанавливаем под ключ."
       />
