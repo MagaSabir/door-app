@@ -1,11 +1,28 @@
 "use client";
 
-import { useActionState, useId } from "react";
+import { useActionState, useId, useSyncExternalStore } from "react";
 import { CircleCheck, LoaderCircle } from "lucide-react";
 import { requestCallback, type CallbackState } from "@/lib/actions/callback";
+import { HONEYPOT_FIELD } from "@/lib/validation";
 import { Field } from "@/components/ui/field";
+import { describeSelection, selectionParams } from "@/lib/data";
 
 const initialState: CallbackState = { status: "idle" };
+
+// The door chosen on a product page arrives as ?model=…&color=…&size=… (client-only; empty on the server)
+const noopSubscribe = () => () => {};
+function useSelectionFromUrl() {
+  const search = useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.search,
+    () => "",
+  );
+  const params = new URLSearchParams(search);
+  const model = params.get(selectionParams.model);
+  return model
+    ? describeSelection(model, params.get(selectionParams.color) ?? undefined, params.get(selectionParams.size) ?? undefined)
+    : "";
+}
 
 export function CallbackForm({
   topic,
@@ -20,6 +37,7 @@ export function CallbackForm({
   submitLabel?: string;
   withComment?: boolean;
 }) {
+  const selection = useSelectionFromUrl();
   const [state, action, pending] = useActionState(requestCallback, initialState);
   const idPrefix = useId().replace(/:/g, "");
   const errors = state.status === "error" ? (state.errors ?? {}) : {};
@@ -39,6 +57,15 @@ export function CallbackForm({
           {text && <p className="mt-2 text-[15px] text-ink-muted">{text}</p>}
           <form action={action} className="mt-5 space-y-4" noValidate>
             <input type="hidden" name="topic" value={topic} />
+            {/* Honeypot: hidden from people and assistive tech, filled in by bots */}
+            <input
+              type="text"
+              name={HONEYPOT_FIELD}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-px w-px opacity-0"
+            />
             <Field
               idPrefix={idPrefix}
               label="Имя"
@@ -62,10 +89,11 @@ export function CallbackForm({
               <label className="block">
                 <span className="mb-1.5 block text-sm text-ink-muted">Комментарий</span>
                 <textarea
+                  key={selection}
                   name="comment"
                   rows={3}
                   maxLength={1000}
-                  defaultValue={values?.comment}
+                  defaultValue={values?.comment ?? selection}
                   placeholder="Адрес, количество дверей, удобное время"
                   className="w-full resize-none rounded-xl border border-black/10 bg-white px-4 py-3 text-[16px] outline-none focus:border-ink/40"
                 />

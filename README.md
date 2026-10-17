@@ -35,6 +35,7 @@ npm start
 | `NEXT_PUBLIC_GOOGLE_VERIFICATION` | Код подтверждения Google Search Console |
 | `TELEGRAM_BOT_TOKEN` | Токен бота от @BotFather |
 | `TELEGRAM_CHAT_ID` | ID чата менеджеров, куда приходят заявки |
+| `ALLOWED_DEV_ORIGINS` | Только для разработки: адреса через запятую, с которых можно открыть dev-сервер |
 
 Без Telegram-переменных заявки только пишутся в лог сервера.
 

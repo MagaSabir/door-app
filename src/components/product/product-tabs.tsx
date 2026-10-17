@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "@/lib/data";
 import { Stars } from "./stars";
 
@@ -17,8 +17,17 @@ const tabs = [
   { id: "reviews", label: "Отзывы" },
 ] as const;
 
+/** Fired by the rating link next to the price to switch to the reviews tab */
+export const SHOW_REVIEWS_EVENT = "product:show-reviews";
+
 export function ProductTabs({ product }: { product: Product }) {
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("description");
+
+  useEffect(() => {
+    const showReviews = () => setTab("reviews");
+    window.addEventListener(SHOW_REVIEWS_EVENT, showReviews);
+    return () => window.removeEventListener(SHOW_REVIEWS_EVENT, showReviews);
+  }, []);
 
   const specs = [
     ["Материал полотна", product.specs.material],

@@ -1,36 +1,82 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { ArrowUpDown, Check, Search, SlidersHorizontal, X } from "lucide-react";
-import { categories, products, pluralize, type Category } from "@/lib/data";
+import { categories, products, pluralize } from "@/lib/data";
 import { ProductCard } from "@/components/product-card";
 import { Sheet } from "@/components/sheet";
 import { FilterPanel, emptyFilters, countActive, type Filters } from "./filter-panel";
+import { catalogSearch, defaultState, parseCatalogState, type CatalogState, type SortId } from "./catalog-url";
 
 const sortOptions = [
   { id: "popular", label: "По популярности" },
   { id: "price-asc", label: "Сначала дешевле" },
   { id: "price-desc", label: "Сначала дороже" },
   { id: "rating", label: "По рейтингу" },
-] as const;
+] as const satisfies readonly { id: SortId; label: string }[];
 
-type SortId = (typeof sortOptions)[number]["id"];
+const noopSubscribe = () => () => {};
 
-export function Catalog() {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<Category | "all">("all");
-  const [filters, setFilters] = useState<Filters>(emptyFilters);
-  const [sort, setSort] = useState<SortId>("popular");
+/**
+ * Server render shows the full catalog (good for SEO). After hydration the URL is read
+ * once and the list remounts with filters from `?…`, so shared links and "back" keep them.
+ */
+export function Catalog({ breadcrumbs }: { breadcrumbs: React.ReactNode }) {
+  const search = useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.search,
+    () => null,
+  );
+  // `initial` is only read when CatalogView mounts, so later URL updates don't reset the UI
+  const ready = search !== null;
+  return (
+    <CatalogView
+      key={ready ? "client" : "server"}
+      initial={ready ? parseCatalogState(search) : defaultState}
+      syncUrl={ready}
+      breadcrumbs={breadcrumbs}
+    />
+  );
+}
+
+function CatalogView({
+  initial,
+  syncUrl,
+  breadcrumbs,
+}: {
+  initial: CatalogState;
+  /** Off for the server-state render, which must not overwrite the URL before it is read */
+  syncUrl: boolean;
+  breadcrumbs: React.ReactNode;
+}) {
+  const [query, setQuery] = useState(initial.query);
+  const [category, setCategory] = useState(initial.category);
+  const [filters, setFilters] = useState<Filters>(initial.filters);
+  const [sort, setSort] = useState<SortId>(initial.sort);
   const [sheet, setSheet] = useState<"filters" | "sort" | null>(null);
+
+  // Keep the address bar in sync so the selection can be shared and survives "back"
+  useEffect(() => {
+    if (!syncUrl) return;
+    const next = `${window.location.pathname}${catalogSearch({ query, category, filters, sort })}`;
+    if (next !== `${window.location.pathname}${window.location.search}`) {
+      window.history.replaceState(window.history.state, "", next);
+    }
+  }, [syncUrl, query, category, filters, sort]);
 
   const result = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // "от" greater than "до" is treated as a swapped range
+    const [min, max] =
+      filters.priceMin != null && filters.priceMax != null && filters.priceMin > filters.priceMax
+        ? [filters.priceMax, filters.priceMin]
+        : [filters.priceMin, filters.priceMax];
     const list = products.filter(
       (p) =>
         (category === "all" || p.category === category) &&
         (!q || p.name.toLowerCase().includes(q)) &&
-        (filters.priceMax == null || p.price <= filters.priceMax) &&
-        (filters.priceMin == null || p.price >= filters.priceMin) &&
+        (max == null || p.price <= max) &&
+        (min == null || p.price >= min) &&
         (filters.colors.length === 0 || filters.colors.some((c) => p.colors.includes(c))) &&
         (filters.coatings.length === 0 || filters.coatings.includes(p.specs.coating)),
     );
@@ -50,8 +96,9 @@ export function Catalog() {
   };
 
   return (
-    <div className="mx-auto max-w-[1440px] px-4 pb-10 pt-5 lg:px-16 lg:pb-24 lg:pt-10">
-      <div className="flex items-end justify-between gap-6">
+    <div className="mx-auto max-w-[1440px] px-4 pb-10 pt-4 lg:px-10 lg:pb-24 lg:pt-6 xl:px-16">
+      {breadcrumbs}
+      <div className="mt-4 flex items-end justify-between gap-6 lg:mt-6">
         <div>
           <h1 className="text-[28px] font-semibold tracking-tight lg:text-5xl">Каталог</h1>
           <p className="mt-1 text-sm text-ink-muted lg:mt-2 lg:text-base">

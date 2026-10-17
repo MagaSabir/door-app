@@ -193,6 +193,17 @@ export const company = {
 // TODO: заменить на реальный контакт менеджера (Telegram/WhatsApp)
 export const managerUrl = "https://t.me/your_manager";
 
+/** Chat link with a prefilled message (t.me and wa.me links accept `?text=`) */
+export function managerLink(text?: string) {
+  return text ? `${managerUrl}?text=${encodeURIComponent(text)}` : managerUrl;
+}
+
+/** Query keys used to pass the chosen door into the measure form */
+export const selectionParams = { model: "model", color: "color", size: "size" } as const;
+
+export function describeSelection(model: string, color?: string, size?: string | number) {
+  return [`Интересует: ${model}`, color && `цвет ${color}`, size && `ширина ${size} мм`].filter(Boolean).join(", ");
+}
 
 const priceFormatter = new Intl.NumberFormat("ru-RU");
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRef } from "react";
+import { useModal } from "@/lib/use-modal";
 import { X } from "lucide-react";
 
 /** Bottom sheet for mobile dialogs (filters, sorting). */
@@ -17,24 +18,20 @@ export function Sheet({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
-  useEffect(() => {
-    if (!open) return;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open, onClose]);
+  const ref = useRef<HTMLDivElement>(null);
+  useModal(open, ref, onClose);
 
   return (
-    <div className={`fixed inset-0 z-50 transition-[visibility] duration-300 lg:hidden ${open ? "visible" : "invisible pointer-events-none"}`} aria-hidden={!open}>
+    <div
+      className={`fixed inset-0 z-50 lg:hidden ${open ? "visible" : "invisible pointer-events-none transition-[visibility] duration-300"}`}
+      inert={!open}
+    >
       <div
         onClick={onClose}
         className={`absolute inset-0 bg-black/40 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
       />
       <div
+        ref={ref}
         role="dialog"
         aria-modal="true"
         aria-label={title}

@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** Hidden form field that people never see; bots fill every input */
+export const HONEYPOT_FIELD = "website";
+
 export const nameSchema = z.string().trim().min(2, "Укажите имя").max(80);
 
 export const phoneSchema = z

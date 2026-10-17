@@ -3,8 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Box, GlassWater, PanelTop, PenLine, Ruler, Send, ShieldCheck } from "lucide-react";
-import { colorById, formatPrice, managerUrl, pluralize, type Product } from "@/lib/data";
+import {
+  colorById,
+  describeSelection,
+  formatPrice,
+  managerLink,
+  pluralize,
+  selectionParams,
+  type Product,
+} from "@/lib/data";
 import { Stars } from "./stars";
+import { SHOW_REVIEWS_EVENT } from "./product-tabs";
 
 export function ProductInfo({
   product,
@@ -16,6 +25,14 @@ export function ProductInfo({
   onColorChange: (color: string) => void;
 }) {
   const [size, setSize] = useState(product.sizes[0]);
+
+  const colorName = colorById[color].name;
+  const selection = describeSelection(product.name, colorName, size);
+  const measureHref = `/installation?${new URLSearchParams({
+    [selectionParams.model]: product.name,
+    [selectionParams.color]: colorName,
+    [selectionParams.size]: String(size),
+  })}#measure`;
 
   const specs = [
     { icon: PanelTop, label: "Материал полотна", value: product.specs.material },
@@ -37,7 +54,11 @@ export function ProductInfo({
       <p className="mt-2 flex items-center gap-2 text-sm lg:mt-3 lg:text-[15px]">
         <Stars value={product.rating} className="size-4" />
         <span className="font-medium">{product.rating.toLocaleString("ru-RU")}</span>
-        <a href="#reviews" className="text-ink-muted hover:text-ink">
+        <a
+          href="#reviews"
+          onClick={() => window.dispatchEvent(new Event(SHOW_REVIEWS_EVENT))}
+          className="text-ink-muted hover:text-ink"
+        >
           ({product.reviews} {pluralize(product.reviews, ["отзыв", "отзыва", "отзывов"])})
         </a>
       </p>
@@ -103,7 +124,7 @@ export function ProductInfo({
 
       <div className="mt-6 space-y-3">
         <a
-          href={managerUrl}
+          href={managerLink(`Здравствуйте! ${selection}.`)}
           target="_blank"
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-ink py-3.5 text-[15px] text-white transition hover:bg-ink/90"
@@ -112,7 +133,7 @@ export function ProductInfo({
           Написать менеджеру
         </a>
         <Link
-          href="/installation#measure"
+          href={measureHref}
           className="flex w-full items-center justify-center gap-2.5 rounded-xl border-[1.5px] border-ink py-3.5 text-[15px] transition hover:bg-surface"
         >
           <Ruler className="size-[18px]" />

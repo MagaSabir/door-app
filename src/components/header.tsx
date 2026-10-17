@@ -2,22 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Menu, Phone, Search, X } from "lucide-react";
 import { Logo } from "./logo";
 import { navLinks, phone } from "@/lib/data";
+import { useModal } from "@/lib/use-modal";
 
 export function Header() {
   const pathname = usePathname();
   const overlay = pathname === "/";
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  const drawerRef = useRef<HTMLElement>(null);
+  const close = () => setOpen(false);
+  useModal(open, drawerRef, close);
 
   return (
     <>
@@ -90,19 +88,26 @@ export function Header() {
       </header>
 
       {/* Mobile drawer */}
-      <div className={`fixed inset-0 z-50 transition-[visibility] duration-300 lg:hidden ${open ? "visible" : "invisible pointer-events-none"}`} aria-hidden={!open}>
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${open ? "visible" : "invisible pointer-events-none transition-[visibility] duration-300"}`}
+        inert={!open}
+      >
         <div
-          onClick={() => setOpen(false)}
+          onClick={close}
           className={`absolute inset-0 bg-black/40 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
         />
         <aside
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Меню"
           className={`absolute right-0 top-0 flex h-full w-[75%] max-w-[300px] flex-col bg-white px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 shadow-xl transition-transform duration-300 ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={close}
             aria-label="Закрыть меню"
             className="ml-auto grid size-10 place-items-center rounded-lg hover:bg-surface"
           >
@@ -113,7 +118,7 @@ export function Header() {
               <Link
                 key={l.href}
                 href={l.href}
-                onClick={() => setOpen(false)}
+                onClick={close}
                 className="border-b border-line py-3.5 text-[17px]"
               >
                 {l.label}

@@ -14,6 +14,8 @@ export async function notifyManager(text: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: chatId, text }),
+    // Don't leave the form spinning if Telegram hangs
+    signal: AbortSignal.timeout(8_000),
   });
   if (!res.ok) throw new Error(`Telegram API ${res.status}`);
 }

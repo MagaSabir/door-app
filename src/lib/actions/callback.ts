@@ -1,8 +1,10 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 import { notifyManager } from "@/lib/server/notify";
-import { nameSchema, phoneSchema } from "@/lib/validation";
+import { rateLimit } from "@/lib/server/rate-limit";
+import { HONEYPOT_FIELD, nameSchema, phoneSchema } from "@/lib/validation";
 
 export type CallbackState =
   | { status: "idle" }
@@ -24,6 +26,9 @@ const schema = z.object({
 });
 
 export async function requestCallback(_prev: CallbackState, formData: FormData): Promise<CallbackState> {
+  // Bot filled the honeypot — pretend success so it doesn't retry
+  if (String(formData.get(HONEYPOT_FIELD) ?? "") !== "") return { status: "success" };
+
   const values = {
     name: String(formData.get("name") ?? ""),
     phone: String(formData.get("phone") ?? ""),
@@ -44,6 +49,12 @@ export async function requestCallback(_prev: CallbackState, formData: FormData):
       if ((key === "name" || key === "phone") && !errors[key]) errors[key] = issue.message;
     }
     return { status: "error", errors, values, message: errors.name || errors.phone ? undefined : "Проверьте данные формы" };
+  }
+
+  // Count only valid submissions, so typos in the form don't lock a real customer out
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (!rateLimit(`callback:${ip}`, { limit: 3, windowMs: 10 * 60_000 })) {
+    return { status: "error", message: "Слишком много заявок подряд. Попробуйте через несколько минут или позвоните нам.", values };
   }
 
   const { topic, name, phone, comment } = parsed.data;

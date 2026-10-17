@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useEffectEvent, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useModal } from "@/lib/use-modal";
 
 const SWIPE = 50;
 
@@ -35,18 +36,18 @@ export function Lightbox({
     else onClose();
   };
 
+  // Scroll lock, Escape and focus trap
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModal(true, dialogRef, close);
+
   const onKey = useEffectEvent((e: KeyboardEvent) => {
-    if (e.key === "Escape") close();
     if (e.key === "ArrowRight") go(1);
     if (e.key === "ArrowLeft") go(-1);
   });
   const onBack = useEffectEvent(() => onClose());
 
-  // Lock page scroll, handle keyboard and the back button
+  // Arrow keys and the back button
   useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
     // Guard against a double push when StrictMode re-runs the effect in dev
     if (!window.history.state?.lightbox) {
       window.history.pushState({ ...window.history.state, lightbox: true }, "");
@@ -58,7 +59,6 @@ export function Lightbox({
     window.addEventListener("keydown", onKey);
 
     return () => {
-      document.body.style.overflow = prevOverflow;
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("keydown", onKey);
     };
@@ -84,6 +84,7 @@ export function Lightbox({
 
   return createPortal(
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={`Фото: ${name}`}
@@ -103,7 +104,7 @@ export function Lightbox({
           close();
         }}
         aria-label="Закрыть"
-        autoFocus
+        data-autofocus
         className="absolute right-3 top-[max(12px,env(safe-area-inset-top))] z-10 grid size-12 place-items-center rounded-full bg-white text-ink shadow-lg"
       >
         <X className="size-6" />
