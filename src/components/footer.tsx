@@ -25,8 +25,8 @@ const columns = [
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:px-16 lg:py-14">
-        <div>
+      <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-6 gap-y-8 px-4 py-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:gap-8 lg:px-10 lg:py-14 xl:px-16">
+        <div className="col-span-2 lg:col-span-1">
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-muted">
             Межкомнатные двери для современного интерьера. Замер, доставка и установка под ключ.
@@ -48,7 +48,7 @@ export function Footer() {
           </nav>
         ))}
 
-        <div>
+        <div className="col-span-2 lg:col-span-1">
           <h2 className="text-sm font-semibold">Связаться с нами</h2>
           <a href={phone.href} className="mt-3 block text-lg font-semibold hover:opacity-80">
             {phone.display}
@@ -65,7 +65,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-line">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-1 px-4 py-5 text-xs text-ink-muted sm:flex-row sm:justify-between lg:px-16">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-1 px-4 py-5 text-xs text-ink-muted sm:flex-row sm:justify-between lg:px-10 xl:px-16">
           <span>
             © <CurrentYear /> {company.name}. Все права защищены.
           </span>
