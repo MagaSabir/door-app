@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ДвериГрад
 
-## Getting Started
+Сайт-каталог межкомнатных дверей: главная, каталог с фильтрами, карточки товаров, страницы «О компании», «Доставка и оплата», «Установка», «Контакты». Заявки на замер и обратный звонок уходят менеджеру в Telegram.
 
-First, run the development server:
+## Стек
+
+- [Next.js 16](https://nextjs.org) (App Router, Cache Components, Server Actions)
+- React 19, TypeScript
+- Tailwind CSS 4
+- Zod — валидация форм на сервере
+- lucide-react — иконки
+
+## Запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Продакшен-сборка:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Переменные окружения
 
-## Learn More
+Скопируйте `.env.example` в `.env.local` и заполните:
 
-To learn more about Next.js, take a look at the following resources:
+| Переменная | Назначение |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Публичный адрес сайта (для OG-картинок) |
+| `TELEGRAM_BOT_TOKEN` | Токен бота от @BotFather |
+| `TELEGRAM_CHAT_ID` | ID чата менеджеров, куда приходят заявки |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Без Telegram-переменных заявки только пишутся в лог сервера.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Структура
 
-## Deploy on Vercel
+```
+src/
+  app/                 страницы (App Router)
+    catalog/           каталог и страницы товаров /catalog/[slug]
+    about, delivery, installation, contacts
+  components/          UI-компоненты
+    catalog/           фильтры и список каталога
+    product/           галерея, просмотр фото, информация о товаре
+    info/              блоки информационных страниц и форма заявки
+  lib/
+    data.ts            товары, цвета, контакты компании
+    actions/           server actions (заявки)
+    server/            серверные утилиты (отправка в Telegram)
+public/images/         оптимизированные изображения (webp)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Как добавить модель
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Положите фото в `public/images/doors/` (webp, по высоте до ~1800px).
+2. Добавьте объект в массив `products` в `src/lib/data.ts`.
+3. Для фото под конкретный цвет укажите `colorImages: { "<id цвета>": "/images/doors/..." }` — галерея переключится при выборе цвета.
