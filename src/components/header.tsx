@@ -96,7 +96,7 @@ export function Header() {
           className={`absolute inset-0 bg-black/40 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
         />
         <aside
-          className={`absolute right-0 top-0 flex h-full w-[82%] max-w-sm flex-col bg-white p-6 shadow-xl transition-transform duration-300 ${
+          className={`absolute right-0 top-0 flex h-full w-[75%] max-w-[300px] flex-col bg-white px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 shadow-xl transition-transform duration-300 ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -114,13 +114,13 @@ export function Header() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="border-b border-line py-4 text-lg"
+                className="border-b border-line py-3.5 text-[17px]"
               >
                 {l.label}
               </Link>
             ))}
           </nav>
-          <a href={phone.href} className="mt-auto flex items-center gap-2 text-lg font-medium">
+          <a href={phone.href} className="mt-auto flex items-center gap-2 text-[17px] font-medium">
             <Phone className="size-5" />
             {phone.display}
           </a>
