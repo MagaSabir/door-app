@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useModal } from "@/lib/use-modal";
 
 const SWIPE = 50;
+const TAP = 10;
 
 /**
  * Fullscreen photo viewer. Closes on: tap anywhere, ✕, Escape, swipe down,
@@ -26,7 +27,8 @@ export function Lightbox({
   onClose: () => void;
 }) {
   const many = images.length > 1;
-  const touch = useRef<{ x: number; y: number } | null>(null);
+  const touch = useRef<{ x: number; y: number; multi: boolean } | null>(null);
+  const lastTouch = useRef(0);
   const go = (d: number) => onIndex((index + d + images.length) % images.length);
 
   // Every UI close goes through history.back(): the popstate handler then calls onClose.
@@ -64,22 +66,40 @@ export function Lightbox({
     };
   }, []);
 
+  // Touch gestures are resolved here entirely (tap / swipe / pinch); onClick is mouse-only.
+  // Otherwise a short or sloppy swipe, or lifting fingers after a pinch, fires a click and closes.
   const onTouchStart = (e: React.TouchEvent) => {
-    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.touches.length > 1) {
+      touch.current = { x: 0, y: 0, multi: true };
+      return;
+    }
+    if ((e.target as Element).closest("button")) return; // buttons handle their own taps
+    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, multi: false };
   };
   const onTouchEnd = (e: React.TouchEvent) => {
+    lastTouch.current = Date.now();
     const start = touch.current;
+    if (!start || e.touches.length > 0) return; // wait until every finger is lifted
     touch.current = null;
-    if (!start) return;
+    if ((e.target as Element).closest("button")) return;
+    e.preventDefault(); // no synthetic click — the gesture is decided below
+    if (start.multi) return; // pinch: neither a tap nor a swipe
     const dx = e.changedTouches[0].clientX - start.x;
     const dy = e.changedTouches[0].clientY - start.y;
-    if (Math.abs(dx) < SWIPE && Math.abs(dy) < SWIPE) return; // a tap — handled by onClick
-    e.preventDefault(); // swipe shouldn't also count as a tap
-    if (Math.abs(dy) > Math.abs(dx)) {
-      if (dy > 0) close();
-    } else if (many) {
+    const adx = Math.abs(dx);
+    const ady = Math.abs(dy);
+    if (adx < TAP && ady < TAP) close();
+    else if (ady > adx) {
+      if (dy > SWIPE) close();
+    } else if (many && adx > SWIPE) {
       go(dx < 0 ? 1 : -1);
     }
+    // anything in between is an unfinished gesture — ignore it
+  };
+  const onClick = () => {
+    // Some browsers still emit a click after touchend; touches are handled above
+    if (Date.now() - lastTouch.current < 700) return;
+    close();
   };
 
   return createPortal(
@@ -89,7 +109,7 @@ export function Lightbox({
       aria-modal="true"
       aria-label={`Фото: ${name}`}
       className="fixed inset-0 z-[100] flex touch-none select-none items-center justify-center bg-black"
-      onClick={close}
+      onClick={onClick}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
