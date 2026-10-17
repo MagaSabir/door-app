@@ -54,10 +54,10 @@ export function Header() {
         }
       >
         <div
-          className={`mx-auto flex max-w-[1440px] items-center justify-between px-16 ${overlay ? "py-8" : "py-5"}`}
+          className={`mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-10 xl:px-16 ${overlay ? "py-8" : "py-5"}`}
         >
           <Logo tone={overlay ? "light" : "dark"} />
-          <nav className="flex items-center gap-8 text-[17px]">
+          <nav className="flex items-center gap-6 whitespace-nowrap text-[15px] xl:gap-8 xl:text-[17px]">
             {navLinks.map((l) => {
               const active = pathname.startsWith(l.href);
               return (
@@ -77,12 +77,12 @@ export function Header() {
               );
             })}
           </nav>
-          <div className={`flex items-center gap-6 ${overlay ? "text-white/90" : "text-ink"}`}>
+          <div className={`flex items-center gap-5 xl:gap-6 ${overlay ? "text-white/90" : "text-ink"}`}>
             <IconLink label="Поиск" href="/catalog">
               <Search />
             </IconLink>
             <span className={`h-8 w-px ${overlay ? "bg-white/20" : "bg-line"}`} />
-            <a href={phone.href} className="text-[17px] hover:opacity-80">
+            <a href={phone.href} className="whitespace-nowrap text-[15px] hover:opacity-80 xl:text-[17px]">
               {phone.display}
             </a>
           </div>

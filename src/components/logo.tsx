@@ -26,7 +26,7 @@ export function Logo({ tone = "dark" }: { tone?: "dark" | "light" }) {
       </span>
       <span className="leading-tight">
         <span className="block text-lg font-semibold tracking-tight lg:text-2xl">ДвериГрад</span>
-        <span className={`block text-[10px] lg:text-sm ${sub}`}>Стильные двери для вашего дома</span>
+        <span className={`block whitespace-nowrap text-[10px] lg:hidden xl:block xl:text-sm ${sub}`}>Стильные двери для вашего дома</span>
       </span>
     </Link>
   );
